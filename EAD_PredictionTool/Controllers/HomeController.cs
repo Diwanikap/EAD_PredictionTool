@@ -18,14 +18,7 @@ namespace EAD_PredictionTool.Controllers
             return View("Index");
         }
 
-
-        [HttpGet("/Login")]
-        public IActionResult Login()
-        {
-            _logger.LogInformation("GET /Login hit");
-            return View();
-        }
-
+ 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Login(LoginModel model)
@@ -37,15 +30,15 @@ namespace EAD_PredictionTool.Controllers
                 if (model.Username == "admin" && model.Password == "123")
                 {
                     _logger.LogInformation("Login successful");
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Login");
                 }
                 else
                 {
                     _logger.LogWarning("Invalid login attempt");
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError("Password", "Invalid login attempt."); 
                 }
             }
-            return View(model);
+            return View("Index",model);
         }
  
 

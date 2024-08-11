@@ -21,7 +21,7 @@
     <div class="login-container">
         <img src="logo.png" alt="Logo" class="logo">
         <h2 class="login-title">Student Prediction Tool</h2>
-        <form   asp-action="Login" asp-controller="Home" method="post">
+        <form   action="Home/Login"    method="post">
             @Html.AntiForgeryToken()
             <div class="form-group">
                 <label asp-for="Username" class="sr-only"></label>
@@ -35,7 +35,7 @@
                 <input asp-for="Password" type="password" class="form-control" placeholder="Password" required />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="submit" class="btn btn-primary btn-block">Login</button> 
         </form>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
