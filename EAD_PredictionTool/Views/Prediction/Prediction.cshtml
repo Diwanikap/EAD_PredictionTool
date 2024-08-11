@@ -1,0 +1,205 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2>Weekly Report</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Session</th>
+                <th>Goal Hours</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Day</th>
+                <th>Total Study Hours</th>
+                <th>Break ID</th>
+                <th>Date</th>
+                <th>Number of Units</th>
+                <th>Enrollment Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="studySessionTableBody">
+            <!-- Data will be populated dynamically via JavaScript -->
+        </tbody>
+    </table>
+    <button class="btn btn-primary" onclick="generatePrediction()">Generate Prediction</button>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Session</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="form-group">
+                        <label for="session">Session</label>
+                        <input type="text" class="form-control" id="session" name="session">
+                    </div>
+                    <div class="form-group">
+                        <label for="goalHours">Goal Hours</label>
+                        <input type="number" class="form-control" id="goalHours" name="goalHours">
+                    </div>
+                    <input type="hidden" id="rowIndex">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveChanges()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prediction Modal -->
+<div class="modal fade" id="predictionModal" tabindex="-1" role="dialog" aria-labelledby="predictionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="predictionModalLabel">Prediction</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Prediction content will be added dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchStudySessions();
+    });
+
+    function fetchData() {
+        fetch('/api/Session/GetStudySessions')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                renderTable(data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                alert('Error fetching data from the server.');
+            });
+    }
+
+    function renderTable(data) {
+        const tableBody = document.getElementById('studySessionTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        if (!data || data.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="11">No data available</td></tr>';
+            return;
+        }
+
+        data.forEach((item, index) => {
+            const row = `
+                <tr>
+                    <td>${item.session}</td>
+                    <td>${item.goalHours}</td>
+                    <td>${item.startTime}</td>
+                    <td>${item.endTime}</td>
+                    <td>${item.day}</td>
+                    <td>${item.totalStudyHours}</td>
+                    <td>${item.breakID}</td>
+                    <td>${item.date}</td>
+                    <td>${item.numberOfUnits}</td>
+                    <td>${item.enrollmentDate}</td>
+                    <td>
+                        <span style="display: flex; gap: 5px;">
+                            <button class="btn btn-warning btn-sm" onclick="editRow(${index})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteRow(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </span>
+                    </td>
+                </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchData(); // Fetch data when the page loads
+    });
+
+    function generatePrediction() {
+        $('#predictionModal .modal-body').html('<p>Prediction results go here...</p>');
+        $('#predictionModal').modal('show');
+    }
+
+    function editRow(index) {
+        const item = data[index];
+        document.getElementById('session').value = item.session;
+        document.getElementById('goalHours').value = item.goalHours;
+        document.getElementById('rowIndex').value = index;
+        $('#editModal').modal('show');
+    }
+
+    function saveChanges() {
+        const index = document.getElementById('rowIndex').value;
+        const session = document.getElementById('session').value;
+        const goalHours = document.getElementById('goalHours').value;
+
+        const updatedData = {
+            session: session,
+            goalHours: goalHours
+            // Include other necessary fields as well
+        };
+
+        fetch(`/api/Session/${data[index].id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    data[index] = updatedData;
+                    $('#editModal').modal('hide');
+                    renderTable(data);
+                } else {
+                    alert('Error updating data');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating data:', error);
+            });
+    }
+
+    function deleteRow(index) {
+        fetch(`/api/Session/${data[index].id}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response.ok) {
+                    data.splice(index, 1);
+                    renderTable(data);
+                } else {
+                    alert('Error deleting data');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting data:', error);
+            });
+    }
+</script>

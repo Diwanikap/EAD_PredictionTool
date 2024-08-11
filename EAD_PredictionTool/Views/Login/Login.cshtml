@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grade Prediction Tool</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #004085;
+            }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+            .btn-secondary:hover {
+                background-color: #5a6268;
+                border-color: #545b62;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center header">
+            <h1 class="display-4">Student Grade Prediction Tool</h1>
+        </div>
+        <form id="studySessionForm">
+            <div class="form-group">
+                <label for="session">Session</label>
+                <input type="text" class="form-control" id="session" name="session" required>
+            </div>
+            <div class="form-group">
+                <label for="goalhours">Goal Hours</label>
+                <input type="number" class="form-control" id="goalhours" name="goalhours" required>
+            </div>
+            <div class="form-group">
+                <label for="startTime">Start Time</label>
+                <input type="time" class="form-control" id="startTime" name="startTime" required>
+            </div>
+            <div class="form-group">
+                <label for="endTime">End Time</label>
+                <input type="time" class="form-control" id="endTime" name="endTime" required>
+            </div>
+            <div class="form-group">
+                <label for="day">Day</label>
+                <select class="form-control" id="day" name="day" required></select>
+            </div>
+            <div class="form-group">
+                <label for="totalStudyhours">Total Study Hours</label>
+                <input type="number" class="form-control" id="totalStudyhours" name="totalStudyhours" required>
+            </div>
+            <div class="form-group">
+                <label for="breakID">Break ID</label>
+                <input type="number" class="form-control" id="breakID" name="breakID" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="numberofUnits">Number of Units</label>
+                <input type="number" class="form-control" id="numberofUnits" name="numberofUnits" required>
+            </div>
+            <div class="form-group">
+                <label for="enrollmentDate">Enrollment Date</label>
+                <input type="date" class="form-control" id="enrollmentDate" name="enrollmentDate" value="2023-08-04">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='@Url.Action("Index", "Prediction")'">Weekly Report & Prediction</button>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('Days.xml')
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(data, 'application/xml');
+                    const days = xmlDoc.getElementsByTagName('day');
+                    const daySelect = document.getElementById('day');
+
+                    for (let i = 0; i < days.length; i++) {
+                        const option = document.createElement('option');
+                        option.value = days[i].textContent;
+                        option.textContent = days[i].textContent;
+                        daySelect.appendChild(option);
+                    }
+                })
+                .catch(error => console.log('Error fetching and parsing XML:', error));
+        });
+
+        document.getElementById('studySessionForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const studySession = {
+                session: formData.get('session'),
+                goalhours: parseInt(formData.get('goalhours')),
+                startTime: formData.get('startTime'),
+                endTime: formData.get('endTime'),
+                day: formData.get('day'),
+                totalStudyhours: parseInt(formData.get('totalStudyhours')),
+                breakID: parseInt(formData.get('breakID')),
+                date: formData.get('date'),
+                numberofUnits: parseInt(formData.get('numberofUnits')),
+                enrollmentDate: formData.get('enrollmentDate')
+            };
+
+            fetch('/http://localhost:0/api/api/Session/PostStudySession', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(studySession)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        alert('Form submitted successfully!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting form:', error);
+                    alert('There was an error submitting the form.');
+                });
+        });
+
+    </script>
+</body>
+</html>
