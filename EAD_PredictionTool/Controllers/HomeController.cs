@@ -26,7 +26,8 @@ namespace EAD_PredictionTool.Controllers
             return View();
         }
 
-        [HttpPost("/Login")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Login(LoginModel model)
         {
             _logger.LogInformation("POST /Login hit with username: {Username}", model.Username);
@@ -46,7 +47,7 @@ namespace EAD_PredictionTool.Controllers
             }
             return View(model);
         }
-
+ 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
