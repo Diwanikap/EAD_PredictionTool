@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@model EAD_PredictionTool.Models.LoginModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -98,7 +103,7 @@
         </form>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () { 
             fetch('Days.xml')
                 .then(response => response.text())
                 .then(data => {

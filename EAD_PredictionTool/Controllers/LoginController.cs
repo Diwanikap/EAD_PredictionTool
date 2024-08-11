@@ -6,7 +6,7 @@ namespace EAD_PredictionTool.Controllers
     {
         public IActionResult Login()
         {
-            return View();
+            return View("Login");
         }
     }
 }
