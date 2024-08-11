@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace StudySession.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class SessionController : ControllerBase
     {

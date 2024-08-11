@@ -1,4 +1,4 @@
-﻿@model EAD_PredictionTool.Models.LoginModel
+﻿
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -138,8 +138,9 @@
                 numberofUnits: parseInt(formData.get('numberofUnits')),
                 enrollmentDate: formData.get('enrollmentDate')
             };
-
-            fetch('/http://localhost:0/api/api/Session/PostStudySession', {
+            var url = 'http://localhost:5193/api/Session/PostStudySession';
+            console.log('URL:', url);
+            fetch('http://localhost:5193/api/Session/PostStudySession', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
